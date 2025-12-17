@@ -6,10 +6,13 @@ import java.util.Set;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.RequiredArgsConstructor;
+import lombok.NonNull;
 
 @Entity
 @Data
 @NoArgsConstructor
+@RequiredArgsConstructor
 public class Student {
 
     @Id
@@ -17,6 +20,7 @@ public class Student {
     private Long id;
 
     @Column(nullable = false)
+    @NonNull
     private String name;
 
     @OneToMany(mappedBy = "requester", cascade = CascadeType.ALL, orphanRemoval = true)
