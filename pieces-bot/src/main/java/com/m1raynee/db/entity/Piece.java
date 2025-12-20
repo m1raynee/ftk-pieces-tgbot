@@ -45,4 +45,8 @@ public class Piece {
         this.box = box;
     }
 
+    public String getTagId() {
+        return "(PCE-%d)".formatted(id);
+    }
+
 }

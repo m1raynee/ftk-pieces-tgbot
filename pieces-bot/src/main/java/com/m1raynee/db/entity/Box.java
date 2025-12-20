@@ -36,4 +36,16 @@ public class Box {
         this.placeCode = placeCode;
     }
 
+    @Override
+    public String toString() {
+        return getTagId() + " " + name;
+    }
+
+    public String getTagId() {
+        var result = "(BOX-" + index;
+        if (placeCode != null)
+            result += ", " + placeCode;
+        return result + ")";
+    }
+
 }

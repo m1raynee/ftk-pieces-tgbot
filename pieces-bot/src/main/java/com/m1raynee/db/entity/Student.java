@@ -29,4 +29,8 @@ public class Student {
         this.name = name;
     }
 
+    public String getTagId() {
+        return "(STU-%d)".formatted(id);
+    }
+
 }

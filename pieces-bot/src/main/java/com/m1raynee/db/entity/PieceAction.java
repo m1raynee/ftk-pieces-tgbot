@@ -59,4 +59,9 @@ public class PieceAction {
         this.performer = performer;
         this.amount = amount;
     }
+
+    public String getTagId() {
+        return "(ACT-%d)".formatted(id);
+    }
+
 }
