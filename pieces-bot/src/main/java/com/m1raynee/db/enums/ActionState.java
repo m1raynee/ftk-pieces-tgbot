@@ -3,6 +3,7 @@ package com.m1raynee.db.enums;
 @lombok.Getter
 @lombok.RequiredArgsConstructor(access = lombok.AccessLevel.PRIVATE)
 public enum ActionState {
+    INVENRATIZATION("I"),
     STORED("S"),
     TAKEN("T"),
     LOST("L");

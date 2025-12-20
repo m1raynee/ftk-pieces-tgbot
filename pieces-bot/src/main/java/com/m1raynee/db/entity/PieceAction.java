@@ -40,6 +40,7 @@ public class PieceAction {
 
     @Column(name = "edited_at", nullable = false)
     private LocalDateTime editedAt;
+    @Column(name = "taken_until")
     private LocalDateTime takenUntil;
 
     @PrePersist
@@ -53,11 +54,12 @@ public class PieceAction {
         editedAt = LocalDateTime.now();
     }
 
-    public PieceAction(Piece piece, Student requester, Student performer, Integer amount) {
+    public PieceAction(Piece piece, Student requester, Student performer, Integer amount, ActionState actionState) {
         this.piece = piece;
         this.requester = requester;
         this.performer = performer;
         this.amount = amount;
+        this.actionState = actionState;
     }
 
     public String getTagId() {

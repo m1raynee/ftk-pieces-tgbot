@@ -1,15 +1,18 @@
 package com.m1raynee.db.entity;
 
-import java.util.HashSet;
 import java.util.Set;
 
 import jakarta.persistence.*;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 @Entity
 @Data
 @NoArgsConstructor
+@EqualsAndHashCode(exclude = { "actions" })
+@ToString(exclude = { "actions" })
 public class Piece {
 
     @Id
@@ -21,9 +24,6 @@ public class Piece {
     @Column(nullable = false)
     private String name;
 
-    @Column(nullable = false)
-    private Integer amount;
-
     @Column(name = "alt_name")
     private String altName;
 
@@ -34,13 +34,15 @@ public class Piece {
     @Column(name = "cell_hint")
     private String cellHint;
 
-    @OneToMany(mappedBy = "piece", cascade = CascadeType.ALL, orphanRemoval = true)
-    private Set<PieceAction> actions = new HashSet<>();
+    @OneToMany(mappedBy = "piece", fetch = FetchType.LAZY)
+    private Set<PieceAction> actions;
 
-    public Piece(String article, String name, Integer amount, String altName, Box box) {
+    @Transient
+    private Long calculatedAmount;
+
+    public Piece(String article, String name, String altName, Box box) {
         this.article = article;
         this.name = name;
-        this.amount = amount;
         this.altName = altName;
         this.box = box;
     }

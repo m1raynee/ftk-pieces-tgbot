@@ -2,8 +2,8 @@ package com.m1raynee.db;
 
 import com.m1raynee.db.entity.Student;
 
-public final class DataBase {
-    private DataBase() {
+public final class Database {
+    private Database() {
     }
 
     public static Student createStudent(String name) {

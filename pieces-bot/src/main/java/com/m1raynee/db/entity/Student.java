@@ -1,15 +1,18 @@
 package com.m1raynee.db.entity;
 
-import java.util.HashSet;
 import java.util.Set;
 
 import jakarta.persistence.*;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 @Entity
 @Data
 @NoArgsConstructor
+@EqualsAndHashCode(exclude = { "requestedActions", "performedActions" })
+@ToString(exclude = { "requestedActions", "performedActions" })
 public class Student {
 
     @Id
@@ -19,11 +22,11 @@ public class Student {
     @Column(nullable = false)
     private String name;
 
-    @OneToMany(mappedBy = "requester", cascade = CascadeType.ALL, orphanRemoval = true)
-    private Set<PieceAction> requestedActions = new HashSet<>();
+    @OneToMany(mappedBy = "requester", fetch = FetchType.LAZY)
+    private Set<PieceAction> requestedActions;
 
-    @OneToMany(mappedBy = "performer", cascade = CascadeType.ALL, orphanRemoval = true)
-    private Set<PieceAction> performedActions = new HashSet<>();
+    @OneToMany(mappedBy = "performer", fetch = FetchType.LAZY)
+    private Set<PieceAction> performedActions;
 
     public Student(String name) {
         this.name = name;

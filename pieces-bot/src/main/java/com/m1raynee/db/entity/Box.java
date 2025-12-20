@@ -1,17 +1,18 @@
 package com.m1raynee.db.entity;
 
-import java.util.HashSet;
 import java.util.Set;
 
 import org.hibernate.annotations.NaturalId;
 
 import jakarta.persistence.*;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
 @Entity
 @Data
 @NoArgsConstructor
+@EqualsAndHashCode(exclude = { "pieces" })
 public class Box {
 
     @Id
@@ -27,8 +28,8 @@ public class Box {
     @Column(name = "place_code", length = 6)
     private String placeCode;
 
-    @OneToMany(mappedBy = "box", cascade = CascadeType.PERSIST)
-    private Set<Piece> pieces = new HashSet<>();
+    @OneToMany(mappedBy = "box", fetch = FetchType.LAZY)
+    private Set<Piece> pieces;
 
     public Box(Integer index, String name, String placeCode) {
         this.index = index;

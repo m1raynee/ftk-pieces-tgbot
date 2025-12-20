@@ -8,6 +8,9 @@ import java.io.IOException;
 import com.m1raynee.db.HibernateConfiguration;
 import com.m1raynee.db.entity.Box;
 import com.m1raynee.db.entity.Piece;
+import com.m1raynee.db.entity.PieceAction;
+import com.m1raynee.db.entity.Student;
+import com.m1raynee.db.enums.ActionState;
 
 public class PieceCreationScript {
     private static final String DELIMITER = ";";
@@ -15,6 +18,12 @@ public class PieceCreationScript {
 
     public static void main(String[] args) {
         HibernateConfiguration.getSessionFactory().inTransaction(session -> {
+            var first_student = session.find(Student.class, 1);
+            if (first_student == null) {
+                first_student = new Student("Егор Даричев");
+                session.persist(first_student);
+            }
+
             try (BufferedReader r = new BufferedReader(new FileReader(FILENAME))) {
                 String line;
                 boolean isHeader = true;
@@ -32,7 +41,7 @@ public class PieceCreationScript {
 
                     Box box = null;
                     if (!values[3].isEmpty())
-                        box = session.find(Box.class, Integer.valueOf(values[3]));
+                        box = session.bySimpleNaturalId(Box.class).load(Integer.valueOf(values[3]));
 
                     String article = values[0].trim();
                     String name = values[1].trim();
@@ -45,10 +54,12 @@ public class PieceCreationScript {
                     Piece piece = new Piece(
                             ((article != null) ? article : null),
                             name,
-                            amount,
                             ((altName != null) ? altName : null),
                             box);
                     session.persist(piece);
+                    session.persist(
+                            new PieceAction(piece, first_student, first_student, amount, ActionState.INVENRATIZATION));
+
                 }
             } catch (FileNotFoundException e) {
                 throw new RuntimeException(e);
