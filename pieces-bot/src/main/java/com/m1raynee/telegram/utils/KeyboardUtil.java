@@ -1,5 +1,6 @@
 package com.m1raynee.telegram.utils;
 
+import com.m1raynee.db.entity.Piece;
 import io.github.natanimn.telebof.enums.ParseMode;
 import io.github.natanimn.telebof.types.inline.InlineQueryResultArticle;
 import io.github.natanimn.telebof.types.input.InputTextMessageContent;
@@ -52,5 +53,30 @@ public final class KeyboardUtil {
             });
         }
         return keyboard;
+    }
+
+    public static InlineKeyboardMarkup paginationPiceAction(Pageable page, Piece piece, boolean isTeacher) {
+        var boxIndex = piece.getBox().getIndex();
+        var pieceActions = piece.getTrActions();
+        var keyboard = new InlineKeyboardMarkup(
+                new InlineKeyboardButton[] { new InlineKeyboardButton("↩️ К коробке", "toBox%d".formatted(boxIndex))
+                });
+        if (!isTeacher)
+            return keyboard;
+        keyboard.setRowWidth(2);
+        keyboard.addKeyboard(new InlineKeyboardButton("◀️", "toPrevPage"),
+                new InlineKeyboardButton("▶️", "toNextPage"));
+        keyboard.setRowWidth(5);
+
+        if (pieceActions != null) {
+            for (int i = 0; i < pieceActions.size(); i++) {
+                keyboard.addKeyboard(new InlineKeyboardButton(
+                        String.valueOf(page.startI() + i + 1),
+                        String.valueOf(pieceActions.get(i).getId())));
+            }
+        }
+
+        return keyboard;
+
     }
 }

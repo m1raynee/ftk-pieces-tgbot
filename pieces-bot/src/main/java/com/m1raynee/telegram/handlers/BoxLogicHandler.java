@@ -41,13 +41,13 @@ public class BoxLogicHandler {
                 InlineSelectorScenario::searchBox);
         bot.onChosenInlineResult(
                 FilterUtils.filterInlineResultState(this::stateShowbox),
-                this::inlineBoxAnswer);
+                BoxLogicHandler::inlineBoxAnswer);
 
         bot.onMessage(filter -> {
             var ref = new ReflectedUtil<Filter>(filter);
             return ref.getStateName(ref.getUpdate().message.from.id) != null
                     && patternPieceI.matcher(ref.getStateName(ref.getUpdate().message.from.id)).find();
-        }, this::lookupBoxPieceI);
+        }, BoxLogicHandler::lookupBoxPieceI);
     }
 
     public static class BoxFilter implements CustomFilter {
@@ -57,7 +57,7 @@ public class BoxLogicHandler {
         }
     }
 
-    public String formBoxPreview(Box box) {
+    public static String formBoxPreview(Box box) {
         String text = "<b>🧰 %s</b>".formatted(box.toString());
         if (box.getPlaceCode() == null) {
             text += " (конструктор)\n";
@@ -76,14 +76,14 @@ public class BoxLogicHandler {
         return text;
     }
 
-    public SendMessage formDefalutBoxSendMessage(BotContext context, long dest, Box box) {
+    public static SendMessage formDefalutBoxSendMessage(BotContext context, long dest, Box box) {
         return context.sendMessage(dest, formBoxPreview(box))
                 .parseMode(ParseMode.HTML)
                 .replyMarkup(KeyboardUtil.boxPreviewKeyboard(AdminFilter.isAdmin(dest)));
     }
 
     @MessageHandler(filter = BoxFilter.class)
-    public void startBoxCommand(BotContext context, Message message) {
+    public static void startBoxCommand(BotContext context, Message message) {
         var matcher = patternStarBox.matcher(message.text);
         Integer box_index;
         if (matcher.find()) {
@@ -99,7 +99,7 @@ public class BoxLogicHandler {
     }
 
     @MessageHandler(commands = "showbox")
-    public void showBoxCommand(BotContext context, Message message) {
+    public static void showBoxCommand(BotContext context, Message message) {
         context.setState(message.chat.id, "showbox-selection");
         context.sendMessage(message.chat.id, "Чтобы выбрать <b>коробку</b> из базы, перейдите в инлайн режим")
                 .parseMode(ParseMode.HTML)
@@ -107,7 +107,7 @@ public class BoxLogicHandler {
                 .exec();
     }
 
-    public void inlineBoxAnswer(BotContext context, ChosenInlineResult result) {
+    public static void inlineBoxAnswer(BotContext context, ChosenInlineResult result) {
         context.setState(result.from.id, "");
         if (result.result_id.contains("null")) {
             context.sendMessage(result.from.id, "Отмена поиска").exec();
@@ -125,7 +125,7 @@ public class BoxLogicHandler {
 
     }
 
-    private void updateKeyboardWithError(BotContext context, Message botMessage, String errorMessage,
+    private static void updateKeyboardWithError(BotContext context, Message botMessage, String errorMessage,
             String inputText) {
         String shortenedText = inputText.length() > 2 ? inputText.substring(0, 2) + "…" : inputText;
 
@@ -141,7 +141,7 @@ public class BoxLogicHandler {
                 .exec();
     }
 
-    public void lookupBoxPieceI(BotContext context, Message message) {
+    public static void lookupBoxPieceI(BotContext context, Message message) {
         context.deleteMessage(message.chat.id, message.message_id).exec();
 
         var data = context.getStateData(message.chat.id);
@@ -169,7 +169,8 @@ public class BoxLogicHandler {
             return;
         }
 
-        data.put("lookupPiece", box.getPieces().get(i));
+        var piece = box.getPieces().get(i);
+        data.put("lookupPiece", piece);
 
         var ref = new ReflectedUtil<BotContext>(context);
         var matcher = patternPieceI.matcher(ref.getStateName(message.from.id));
@@ -178,12 +179,20 @@ public class BoxLogicHandler {
 
         switch (operation) {
             case "showPiece":
-                // TODO
-
+                context.setState(message.from.id, "");
+                PieceLogicHandler.handlePreview(context, message.from.id);
                 break;
             case "createAction":
-                // TODO
-
+                context.editMessageReplyMarkup(botMessage.chat.id, botMessage.message_id)
+                        .replyMarkup(KeyboardUtil.boxPreviewKeyboard(AdminFilter.isAdmin(message.from.id)))
+                        .exec();
+                context.setState(message.from.id, "performer");
+                context.sendMessage(botMessage.chat.id,
+                        "Чтобы выбрать, кому выдать деталь, передйтите в инлайн режим\n" +
+                                "<b>Деталь:</b> %s".formatted(piece.getName()))
+                        .parseMode(ParseMode.HTML)
+                        .replyMarkup(KeyboardUtil.moveToInlineSingle())
+                        .exec();
                 break;
             case "finalizeAction":
                 // TODO
@@ -197,19 +206,20 @@ public class BoxLogicHandler {
     }
 
     @CallbackHandler(regex = "lookupBox-")
-    public void lookupBoxButton(BotContext context, CallbackQuery callback) {
-        if (context.getStateData(callback.from.id) == null
-                || !context.getStateData(callback.from.id).containsKey("lookupBox")
-                || !context.getStateData(callback.from.id).containsKey("lookupMessage")) {
+    public static void lookupBoxButton(BotContext context, CallbackQuery callback) {
+        var data = context.getStateData(callback.from.id);
+        if (data == null
+                || !data.containsKey("lookupBox")
+                || !data.containsKey("lookupMessage")) {
             context.answerCallbackQuery(callback.id,
                     "Состояние устарело, начните заново")
                     .showAlert(true)
                     .exec();
             return;
         }
-        var botMessage = (Message) context.getStateData(callback.from.id).get("lookupMessage");
+        var botMessage = (Message) data.get("lookupMessage");
 
-        if (botMessage != callback.message) {
+        if (!botMessage.message_id.equals(callback.message.message_id)) {
             context.answerCallbackQuery(callback.id,
                     "Эта клавиатура уже неактивна")
                     .showAlert(true)
@@ -229,6 +239,12 @@ public class BoxLogicHandler {
         }
         if (actions[1].equals("showPiece") || actions[1].equals("createAction")
                 || actions[1].equals("finalizeAction")) {
+            if (!actions[1].equals("showPiece")) {
+                if (!data.containsKey("activeStudent")) {
+                    context.sendMessage(callback.from.id, "Сначала выберите исполнителя: /setactive").exec();
+                    return;
+                }
+            }
             context.setState(callback.from.id, "lookupBox-%s-i".formatted(actions[1]));
             context.editMessageReplyMarkup(callback.message.chat.id, callback.message.message_id)
                     .replyMarkup(new InlineKeyboardMarkup(

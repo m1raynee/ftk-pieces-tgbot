@@ -47,13 +47,13 @@ public class PieceAction {
     private LocalDateTime takenUntil;
 
     @PrePersist
-    protected void onCreate() {
+    private void onCreate() {
         createdAt = LocalDateTime.now();
         editedAt = LocalDateTime.now();
     }
 
     @PreUpdate
-    protected void onUpdate() {
+    private void onUpdate() {
         editedAt = LocalDateTime.now();
     }
 

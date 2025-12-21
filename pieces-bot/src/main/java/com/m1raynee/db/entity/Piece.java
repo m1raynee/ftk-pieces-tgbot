@@ -38,7 +38,12 @@ public class Piece {
     private List<PieceAction> actions;
 
     @Transient
-    private Long calculatedAmount;
+    private List<PieceAction> trActions;
+
+    @Transient
+    private Long positiveAmount;
+    @Transient
+    private Long negativeAmount;
 
     public Piece(String article, String name, String altName, Box box) {
         this.article = article;
@@ -49,6 +54,10 @@ public class Piece {
 
     public String getTagId() {
         return "(PCE-%d)".formatted(id);
+    }
+
+    public Long getCalculatedAmount() {
+        return positiveAmount - negativeAmount;
     }
 
 }

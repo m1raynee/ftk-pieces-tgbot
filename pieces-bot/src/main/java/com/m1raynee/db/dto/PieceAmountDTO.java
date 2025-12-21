@@ -1,15 +1,12 @@
 package com.m1raynee.db.dto;
 
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 
 @Getter
+@RequiredArgsConstructor
 public class PieceAmountDTO {
-    private Long pieceId;
-    private Long currentAmount;
-
-    public PieceAmountDTO(Long pieceId, Long currentAmount) {
-        this.pieceId = pieceId;
-        this.currentAmount = currentAmount;
-    }
-
+    final Long pieceId;
+    final Long positiveAmount;
+    final Long negativeAmount;
 }

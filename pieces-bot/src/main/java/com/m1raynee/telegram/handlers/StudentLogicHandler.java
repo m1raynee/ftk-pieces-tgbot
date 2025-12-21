@@ -40,7 +40,7 @@ public class StudentLogicHandler {
     void inlineStudentAnswer(BotContext context, ChosenInlineResult result) {
         context.setState(result.from.id, "");
         context.getStateData(result.from.id).put("activeStudent", result.result_id);
-        context.sendMessage(result.from.id, "Установлен исполнитель %s".formatted(result.result_id)).exec();
+        context.sendMessage(result.from.id, "Установлен исполнитель (STU-%s)".formatted(result.result_id)).exec();
     }
 
 }
