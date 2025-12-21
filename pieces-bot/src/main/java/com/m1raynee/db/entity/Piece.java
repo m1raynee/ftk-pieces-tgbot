@@ -1,6 +1,6 @@
 package com.m1raynee.db.entity;
 
-import java.util.Set;
+import java.util.List;
 
 import jakarta.persistence.*;
 import lombok.Data;
@@ -35,7 +35,7 @@ public class Piece {
     private String cellHint;
 
     @OneToMany(mappedBy = "piece", fetch = FetchType.LAZY)
-    private Set<PieceAction> actions;
+    private List<PieceAction> actions;
 
     @Transient
     private Long calculatedAmount;

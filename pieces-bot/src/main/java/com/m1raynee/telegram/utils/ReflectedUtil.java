@@ -78,4 +78,18 @@ public class ReflectedUtil<T> {
             userStorage.put(id, newData);
         }
     }
+
+    public boolean clearStateUnless(Long id) {
+        if (getStorage().getData(id) == null)
+            return false;
+        String activeStudentId = (String) getStorage().getData(id).getOrDefault("activeStudent", "null");
+        if (getStateName(id) != null && getStateName(id).isEmpty()) {
+            storage.clear(id);
+            if (activeStudentId != "null") {
+                storage.getData(id).put("activeStudent", activeStudentId);
+            }
+            return true;
+        }
+        return false;
+    }
 }

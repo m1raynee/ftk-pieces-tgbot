@@ -1,6 +1,6 @@
 package com.m1raynee.db.entity;
 
-import java.util.Set;
+import java.util.List;
 
 import org.hibernate.annotations.NaturalId;
 
@@ -29,7 +29,7 @@ public class Box {
     private String placeCode;
 
     @OneToMany(mappedBy = "box", fetch = FetchType.LAZY)
-    private Set<Piece> pieces;
+    private List<Piece> pieces;
 
     public Box(Integer index, String name, String placeCode) {
         this.index = index;

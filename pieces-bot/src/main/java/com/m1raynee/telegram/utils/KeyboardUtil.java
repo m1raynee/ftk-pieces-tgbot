@@ -23,11 +23,11 @@ public final class KeyboardUtil {
     }
 
     public static InlineKeyboardMarkup moveToInlineSingle() {
-        return new InlineKeyboardMarkup(new InlineKeyboardButton[] { KeyboardUtil.moveToInline() });
+        return new InlineKeyboardMarkup(new InlineKeyboardButton[] { moveToInline() });
     }
 
     public static InlineKeyboardMarkup moveToInlineSingle(String text, String query) {
-        return new InlineKeyboardMarkup(new InlineKeyboardButton[] { KeyboardUtil.moveToInline(text, query) });
+        return new InlineKeyboardMarkup(new InlineKeyboardButton[] { moveToInline(text, query) });
     }
 
     public static ReplyKeyboardMarkup baseKeyboard(boolean isTeacher) {
@@ -36,6 +36,21 @@ public final class KeyboardUtil {
             keyboard.add("🛠️ Управление действиями");
         }
         keyboard.add("🔎 Поиск детали", "👤 Информация об ученике");
+        return keyboard;
+    }
+
+    public static InlineKeyboardMarkup boxPreviewKeyboard(boolean isTeacher) {
+        var keyboard = new InlineKeyboardMarkup(new InlineKeyboardButton[] {
+                new InlineKeyboardButton("🧩 Информация о детали", "lookupBox-showPiece"),
+        });
+        if (isTeacher) {
+            keyboard.setRowWidth(2);
+            keyboard.addKeyboard(new InlineKeyboardButton[] {
+                    new InlineKeyboardButton("🛠️ Выдать деталь", "lookupBox-createAction"),
+                    new InlineKeyboardButton("🛠️ Вернуть деталь", "lookupBox-finalizeAction"),
+                    new InlineKeyboardButton("🛠️ История действий", "lookupBox-showAction"),
+            });
+        }
         return keyboard;
     }
 }

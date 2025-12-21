@@ -5,7 +5,7 @@ import com.m1raynee.db.enums.ActionState;
 import jakarta.persistence.AttributeConverter;
 import jakarta.persistence.Converter;
 
-@Converter(autoApply = true)
+@Converter
 public class ActionStateConverter implements AttributeConverter<ActionState, String> {
     @Override
     public String convertToDatabaseColumn(ActionState category) {

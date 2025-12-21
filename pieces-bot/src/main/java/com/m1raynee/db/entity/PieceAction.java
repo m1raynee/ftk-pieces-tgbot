@@ -1,6 +1,8 @@
 package com.m1raynee.db.entity;
 
 import java.time.LocalDateTime;
+
+import com.m1raynee.db.converters.ActionStateConverter;
 import com.m1raynee.db.enums.ActionState;
 
 import jakarta.persistence.*;
@@ -32,7 +34,8 @@ public class PieceAction {
     @Column(nullable = false)
     private Integer amount;
 
-    @Column(name = "action_state", nullable = false)
+    @Column(name = "action_state", nullable = false, length = 1)
+    @Convert(converter = ActionStateConverter.class)
     private ActionState actionState = ActionState.TAKEN;
 
     @Column(name = "created_at", nullable = false, updatable = false)

@@ -1,6 +1,6 @@
 package com.m1raynee.db.entity;
 
-import java.util.Set;
+import java.util.List;
 
 import jakarta.persistence.*;
 import lombok.Data;
@@ -23,10 +23,10 @@ public class Student {
     private String name;
 
     @OneToMany(mappedBy = "requester", fetch = FetchType.LAZY)
-    private Set<PieceAction> requestedActions;
+    private List<PieceAction> requestedActions;
 
     @OneToMany(mappedBy = "performer", fetch = FetchType.LAZY)
-    private Set<PieceAction> performedActions;
+    private List<PieceAction> performedActions;
 
     public Student(String name) {
         this.name = name;

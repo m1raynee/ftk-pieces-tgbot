@@ -22,13 +22,18 @@ public final class Database {
     public static Box fetchBoxPreview(Integer box_index) {
         return HibernateConfiguration.getSessionFactory().fromSession(session -> {
             List<PieceAmountDTO> amounts = session.createSelectionQuery("""
-                    select new com.m1raynee.db.dto.PieceAmountDTO(p.id, SUM(pa.amount))
+                    select new com.m1raynee.db.dto.PieceAmountDTO(p.id, SUM(case pa.actionState
+                    when 'I' then pa.amount
+                    when 'T' then -pa.amount
+                    when 'S' then 0
+                    when 'L' then -pa.amount
+                    else 0 end ))
                     from Piece p
                     left join p.actions pa
                     join p.box b
                     where b.index=:index
                     group by p.id
-                    """,
+                    """.replace("\n", " "),
                     PieceAmountDTO.class)
                     .setParameter("index", box_index)
                     .getResultList();
