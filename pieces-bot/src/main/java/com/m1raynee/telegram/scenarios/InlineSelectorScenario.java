@@ -15,7 +15,7 @@ public class InlineSelectorScenario {
     public static void searchStudent(BotContext context, InlineQuery query) {
         if (query.query.isEmpty()) {
             context.answerInlineQuery(query.id, new InlineQueryResult[] {
-                    KeyboardUtil.emptyQueryResult("🔎 Начните вводить имя", "Ничего не введено...")
+                    KeyboardUtil.emptyQueryResult("🔎 Начните вводить имя ученика", "Ничего не введено...")
                             .description("А затем выберите его в этом списке") })
                     .cacheTime(10)
                     .exec();
@@ -49,7 +49,7 @@ public class InlineSelectorScenario {
     public static void searchBox(BotContext context, InlineQuery query) {
         if (query.query.isEmpty()) {
             context.answerInlineQuery(query.id, new InlineQueryResult[] {
-                    KeyboardUtil.emptyQueryResult("🔎 Начните вводить название", "Ничего не введено...")
+                    KeyboardUtil.emptyQueryResult("🔎 Начните вводить название коробки", "Ничего не введено...")
                             .description("А затем выберите его в этом списке") })
                     .cacheTime(10)
                     .exec();
@@ -68,6 +68,40 @@ public class InlineSelectorScenario {
                         return new InlineQueryResultArticle(box.getIndex().toString(), box.getName(),
                                 new InputTextMessageContent(box.getName() + " " + box.getTagId()))
                                 .description(box.getTagId());
+                    }).toArray(InlineQueryResult[]::new);
+        });
+
+        if (match.length < 1) {
+            match = new InlineQueryResult[] {
+                    KeyboardUtil.emptyQueryResult("❌ Ничего не найдено", "Ничего не найдено...")
+                            .description("Коробка с таким именем не существует") };
+        }
+
+        context.answerInlineQuery(query.id, match).cacheTime(500).exec();
+    }
+
+    public static void searchPiece(BotContext context, InlineQuery query) {
+        if (query.query.isEmpty()) {
+            context.answerInlineQuery(query.id, new InlineQueryResult[] {
+                    KeyboardUtil.emptyQueryResult("🔎 Начните вводить имя детали", "Ничего не введено...")
+                            .description("А затем выберите его в этом списке") })
+                    .cacheTime(10)
+                    .exec();
+            return;
+        }
+
+        var sessionFactory = HibernateConfiguration.getSessionFactory();
+
+        InlineQueryResult[] match = sessionFactory.fromSession(session -> {
+            return session
+                    .createSelectionQuery("from Piece p where p.name like :name", Box.class)
+                    .setParameter("name", "%" + query.query + "%")
+                    .setMaxResults(20)
+                    .getResultStream()
+                    .map(piece -> {
+                        return new InlineQueryResultArticle(piece.getIndex().toString(), piece.getName(),
+                                new InputTextMessageContent(piece.getName() + " " + piece.getTagId()))
+                                .description(piece.getTagId());
                     }).toArray(InlineQueryResult[]::new);
         });
 
