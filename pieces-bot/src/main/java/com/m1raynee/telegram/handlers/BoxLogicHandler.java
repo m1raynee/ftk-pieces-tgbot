@@ -199,13 +199,25 @@ public class BoxLogicHandler {
     @CallbackHandler(regex = "lookupBox-")
     public void lookupBoxButton(BotContext context, CallbackQuery callback) {
         if (context.getStateData(callback.from.id) == null
-                || !context.getStateData(callback.from.id).containsKey("lookupBox")) {
+                || !context.getStateData(callback.from.id).containsKey("lookupBox")
+                || !context.getStateData(callback.from.id).containsKey("lookupMessage")) {
             context.answerCallbackQuery(callback.id,
-                    "Неизвестное состояние, не выбрана текущая коробка")
+                    "Состояние устарело, начните заново")
                     .showAlert(true)
                     .exec();
             return;
         }
+        var botMessage = (Message) context.getStateData(callback.from.id).get("lookupMessage");
+
+        if (botMessage != callback.message) {
+            context.answerCallbackQuery(callback.id,
+                    "Эта клавиатура уже неактивна")
+                    .showAlert(true)
+                    .exec();
+            return;
+        }
+
+        context.answerCallbackQuery(callback.id).exec();
 
         var actions = callback.data.split("-");
         if (actions[1].equals("back")) {

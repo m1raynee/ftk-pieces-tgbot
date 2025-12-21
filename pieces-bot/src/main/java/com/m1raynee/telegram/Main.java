@@ -2,6 +2,7 @@ package com.m1raynee.telegram;
 
 import com.m1raynee.db.HibernateConfiguration;
 import com.m1raynee.telegram.handlers.BoxLogicHandler;
+import com.m1raynee.telegram.handlers.PieceActionLogicHandler;
 import com.m1raynee.telegram.handlers.StartLogicHandler;
 import com.m1raynee.telegram.handlers.StudentLogicHandler;
 
@@ -21,6 +22,7 @@ public class Main {
         bot.addHandler(new StudentLogicHandler(bot));
         bot.addHandler(new BoxLogicHandler(bot));
         bot.addHandler(new StartLogicHandler(bot));
+        bot.addHandler(new PieceActionLogicHandler(bot));
 
         System.out.println("Starting polling...");
 
